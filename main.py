@@ -30,6 +30,8 @@ def main():
     fontname = st.selectbox("폰트 선택", unique(fontNames))
     plt.rc('font', family=fontname)
 
+    print(fontname)
+
     st.title("차트 그리기")
 
     scy_df = pd.read_excel("seoul_cctv_byyear.xlsx")
