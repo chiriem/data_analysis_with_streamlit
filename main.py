@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # windows용 한글 폰트 오류 해결
 from matplotlib import font_manager, rc
-font_path = "C:/Windows/Fonts/malgun.ttf"
+font_path = "malgun.ttf"
 font_name = font_manager.FontProperties(fname= font_path).get_name()
 rc("font", family = font_name)
 
