@@ -6,9 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import matplotlib.font_manager as fm # 한글 폰트 관련 용도
 
-def unique(list):
-    x = np.array(list)
-    return np.unique(x)
+from cctv_app import run_cctv_app
 
 @st.cache_data
 def fontRegistered():
@@ -20,32 +18,38 @@ def fontRegistered():
     fm._load_fontmanager(try_read_cache=False)
 
 def main():
+    menu = ['Home', 'CCTV', 'ML', 'About']
+    choice = st.sidebar.selectbox("menu", menu)
+    if choice == "Home":
+        st.subheader("Home")
+    elif choice == "CCTV":
+        run_cctv_app()
+    elif choice == "ML":
+        st.subheader("ML")
+    elif choice == "About":
+        st.subheader("About")
+    else: 
+        pass
 
-    # 한글 폰트 선택
-    st.markdown("# Hello Strealit")
-    st.write(np.__version__)
+    # # matplotlib 한글 깨짐 방지 장치
+    # fontRegistered()
+    # plt.rc('font', family="Malgun Gothic")
 
-    fontRegistered()
-    fontNames = [f.name for f in fm.fontManager.ttflist]
-    # fontname = st.selectbox("폰트 선택", unique(fontNames))
-    # plt.rc('font', family=fontname)
-    plt.rc('font', family="Malgun Gothic")
+    # st.title("차트 그리기")
 
-    st.title("차트 그리기")
+    # scy_df = pd.read_excel("seoul_cctv_byyear.xlsx")
 
-    scy_df = pd.read_excel("seoul_cctv_byyear.xlsx")
+    # st.dataframe(scy_df)
 
-    st.dataframe(scy_df)
+    # df_jongno = scy_df.iloc[0,1:]
 
-    df_jongno = scy_df.iloc[0,1:]
-
-    # 차트 그리기
-    fig = plt.figure()
-    plt.bar(df_jongno.index, df_jongno)
-    plt.title("연도별 종로구 cctv 수")
-    plt.xlabel("년도")
-    plt.ylabel("갯수")
-    st.pyplot(fig)
+    # # 차트 그리기
+    # fig = plt.figure()
+    # plt.bar(df_jongno.index, df_jongno)
+    # plt.title("연도별 종로구 cctv 수")
+    # plt.xlabel("년도")
+    # plt.ylabel("갯수")
+    # st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
