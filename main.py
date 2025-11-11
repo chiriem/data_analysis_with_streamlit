@@ -15,6 +15,8 @@ from streamlit_folium import folium_static
 import time
 from vega_datasets import data
 
+from cctv_app import run_cctv_app
+
 st.markdown("""
     <style>
     .stVerticalBlock {
@@ -29,13 +31,14 @@ def page_config():
         page_title="Seoul Crime Analysis",
         page_icon="📈",
         layout="wide",
-        initial_sidebar_state="auto")
+        # initial_sidebar_state="auto"
+        )
     alt.themes.enable("dark")
 
-option = st.sidebar.selectbox(
-    "Menu",
-    ("A1", "B1", "C1")
-)
+# option = st.sidebar.selectbox(
+#     "Menu",
+#     ("A1", "B1", "C1")
+# )
 
 @st.cache_data
 def get_data():
@@ -189,6 +192,9 @@ def main():
 
     with tab_enter:
         st.header("Header Test")
+
+    with tab_cctv:
+        run_cctv_app()
 
 @st.cache_data
 def fontRegistered():

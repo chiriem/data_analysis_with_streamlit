@@ -26,7 +26,7 @@ def run_cctv_app():
     plt.rc('font', family="Malgun Gothic")
 
     # 메뉴 지정
-    submenu = st.sidebar.selectbox("submenu", ['연도별 CCTV', 'CCTV 위치', '분석'])
+    submenu = st.selectbox("submenu", ['연도별 CCTV', 'CCTV 위치', '분석'])
     if submenu == "submenu":
         st.subheader("submenu")
     elif submenu == "연도별 CCTV":
@@ -108,7 +108,7 @@ def run_cctv_app():
         else:
             df_gu = pd.read_excel("cctv_count.xlsx")
             focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
-            map_gu = folium.Map(location = focus_on, zoom_start = 11, zoom_control= False)
+            map_gu = folium.Map(location = focus_on, zoom_start = 11, min_zoom = 11, max_zoom = 11, zoom_control= False)
 
             for i in range(len(df_gu)):
                 data = df_gu.iloc[i]
