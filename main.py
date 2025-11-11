@@ -31,26 +31,6 @@ def main():
     else: 
         pass
 
-    # # matplotlib 한글 깨짐 방지 장치
-    # fontRegistered()
-    # plt.rc('font', family="Malgun Gothic")
-
-    # st.title("차트 그리기")
-
-    # scy_df = pd.read_excel("seoul_cctv_byyear.xlsx")
-
-    # st.dataframe(scy_df)
-
-    # df_jongno = scy_df.iloc[0,1:]
-
-    # # 차트 그리기
-    # fig = plt.figure()
-    # plt.bar(df_jongno.index, df_jongno)
-    # plt.title("연도별 종로구 cctv 수")
-    # plt.xlabel("년도")
-    # plt.ylabel("갯수")
-    # st.pyplot(fig)
-
 if __name__ == "__main__":
     main()
 

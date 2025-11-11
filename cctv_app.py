@@ -68,7 +68,7 @@ def run_cctv_app():
         st.markdown(f"### {inc[0].round(1)}% 증가")
 
     elif submenu == "CCTV 위치":
-        st.subheader("CCTV 위치")
+        st.title("CCTV 위치")
 
         df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
 
@@ -116,11 +116,7 @@ def run_cctv_app():
                 popup = folium.Popup(iframe, min_width=100, max_width= 300)
                 folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
         
-
-
         folium_static(map_gu)
-        
-
 
     elif submenu == "분석":
         st.subheader("분석")
