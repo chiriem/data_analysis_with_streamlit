@@ -29,8 +29,9 @@ def to_pivot(value):
 
 @st.cache_data
 def get_region():
-    region = pd.read_excel("./data/월별지역인구수.xlsx")
-    region = to_pivot(region)
+    region = pd.read_excel("./data/real_서울인구.xlsx")
+    region = region.set_index("구")
+    region = region.iloc[1:,:]
     return region
 
 def run_population_app():
@@ -50,7 +51,7 @@ def run_population_app():
 
     for col in row2:
         tile = col.container(height=100, border=True)
-        value = tile.slider("연도 선택", 2017, 2023, key="population_year")
+        value = tile.slider("연도 선택", 2017, 2024, key="population_year")
 
     with row3.container(height=600, border=True):
 
@@ -67,7 +68,7 @@ def run_population_app():
             geo_str,
             style_function=style_function
         ).add_to(ko)
-        region = region.loc[region_select, value].to_frame(name="인구 수")
+        region = region.loc[region_select, f"{value}년"].to_frame(name="인구 수")
 
 
         kmap = folium.Choropleth(
