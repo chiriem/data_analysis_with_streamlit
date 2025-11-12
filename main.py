@@ -8,6 +8,7 @@ from safe_app import run_safe_app
 from enter_app import run_enter_app
 from reigon_app import run_reigon_app
 from time_app import run_time_app
+from populaion_app import run_population_app
 
 st.markdown("""
     <style>
@@ -47,7 +48,7 @@ def main():
         run_enter_app()
 
     with tab_popul:
-        st.title("개발중")
+        run_population_app()
 
     with tab_safe:
         run_safe_app()
