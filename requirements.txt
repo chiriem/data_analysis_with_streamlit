@@ -6,3 +6,6 @@ openpyxl
 seaborn
 folium
 streamlit-folium
+plotly-express
+geopandas
+vega_datasets
