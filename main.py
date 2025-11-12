@@ -9,6 +9,7 @@ from enter_app import run_enter_app
 from reigon_app import run_reigon_app
 from time_app import run_time_app
 from populaion_app import run_population_app
+from office_app import run_office_app
 
 st.markdown("""
     <style>
@@ -54,7 +55,7 @@ def main():
         run_safe_app()
 
     with tab_police:
-        st.title("개발중")
+        run_office_app()
 
 @st.cache_data
 def fontRegistered():
