@@ -22,6 +22,11 @@ def get_safe():
     return safe
 
 @st.cache_data
+def get_safe_crime():
+    safe_crime = pd.read_csv("./data/지킴이집_찐막.csv")
+    return safe_crime
+
+@st.cache_data
 def my_map():
     safe = get_safe()
 
@@ -44,20 +49,22 @@ def run_safe_app():
     safe = get_safe()
 
     for col in row1:
-        tile = col.container(height=100, border=True)
-        tile.multiselect(
+        tile = col.container(height=170, border=True)
+        select_reigon = tile.multiselect(
             "자치구 선택",
-            ["강남구", "마포구", "서초구", "서대문구"],
-            default=["서대문구"], key="safe_reigon")
+            safe["자치구"].unique(),
+            default=safe["자치구"].unique(), key="safe_reigon")
 
-    for col in row2:
-        tile = col.container(height=100, border=True)
-        tile.slider("연도 선택", 2011, 2025, (2011, 2025), key="safe_year")
+    # for col in row2:
+    #     tile = col.container(height=100, border=True)
+    #     tile.slider("연도 선택", 2011, 2025, (2011, 2025), key="safe_year")
+    safe_crime = get_safe_crime()
 
-    source = data.barley()
-
-    row3.container(height=400, border=True).bar_chart(source, x="variety", y="yield", color="site", horizontal=True)
-    row4.container(height=400, border=True).title("Analysis Result")
+    with row3.container(height=400, border=True):
+        chart = alt.Chart(safe_crime[safe_crime["자치구"].isin(select_reigon)]).mark_point().encode(x="지킴이집 갯수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("지킴이집 갯수"), alt.Tooltip("범죄수")]).properties(title="자치구별 지킴이집 & 범죄 수 산점도")
+        st.altair_chart(chart, use_container_width=True)
+    with row4.container(height=400, border=True):
+        st.write("여성안심지킴이집이 많이 구비된 강남구는 범죄발생건수가 가장 높다. 여성안심지킴이집은 범죄율 감소에 영향을 주지 않는다고 보여진다.")
 
     with row5:
         my_map()

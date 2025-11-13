@@ -10,6 +10,7 @@ import os
 import matplotlib.font_manager as fm # 한글 폰트 관련 용도
 from vega_datasets import data
 import altair as alt
+import scipy.stats as stats
 
 @st.cache_data
 def get_cctv():
@@ -25,6 +26,26 @@ def get_cctv_wgs84():
     return cctv_wgs84
 
 @st.cache_data
+def get_cctv_test():
+    cctv_test = pd.read_csv("./data/cctv_테스트.csv")
+    return cctv_test
+
+@st.cache_data
+def get_crime_test():
+    crime_test = pd.read_csv("./data/crime_테스트.csv")
+    return crime_test
+
+@st.cache_data
+def get_rate():
+    rate = pd.read_csv("./data/cctv_개찐막.csv")
+    return rate
+
+@st.cache_data
+def get_cctv_crime():
+    cctv = pd.read_csv("./data/cctv_끝.csv")
+    return cctv
+
+@st.cache_data
 def my_map():
     cctv_wgs84 = get_cctv_wgs84()
     m = folium.Map(location=[cctv_wgs84["위도"].mean(), cctv_wgs84["경도"].mean()], zoom_start=12, width=800)
@@ -38,6 +59,12 @@ def my_map():
     folium_static(m)
 
 @st.cache_data
+<<<<<<< HEAD
+def pearson():
+    cctv = get_cctv_crime()
+    corr = stats.pearsonr(cctv["CCTV"], cctv["Crime"])
+    return corr
+=======
 def cctv_loc():
         
     df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
@@ -87,14 +114,17 @@ def cctv_loc():
             folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
         
     folium_static(map_gu)
+>>>>>>> 7982b09d9f2102232759a8462076f7f134a89e6f
 
 def run_cctv_app():
     row1 = st.columns(1)
     row2 = st.columns(1)
-    row3 = st.columns(1)
+    row3, row4 = st.columns([7, 3])
     row5, row6 = st.columns([4, 6])
 
     cctv = get_cctv()
+    corr = pearson()
+    cctv_crime = get_cctv_crime()
 
     for col in row1:
         tile = col.container(height=170, border=True)
@@ -105,17 +135,16 @@ def run_cctv_app():
 
     for col in row2:
         tile = col.container(height=100, border=True)
-        cctv_value = tile.slider("연도 선택", 2016, 2025, (2016, 2025), key="cctv_year")
-
-    for col in row3:
-        tile = col.container(height=400, border=True).line_chart(cctv.loc[f"{cctv_value[0]}년":f"{cctv_value[1]}년", cctv_reigon])
-    # with row3.container(height=400, border=True):
-    #     chart = alt.Chart(cctv).mark_line().encode(
-    #         x=alt.X(cctv.index, axis=alt.Axis(labelAngle=90)),
-    #         y=None
-    #     ).properties()
-    #     st.altair_chart(chart, use_container_width=True)
-    #row4.container(height=400, border=True).title("Analysis Result")
+        cctv_value = tile.slider("연도 선택", 2016, 2024, (2016, 2024), key="cctv_year")
+    
+    with row3.container(height=400, border=True):
+        chart = alt.Chart(cctv_crime[cctv_crime["자치구"].isin(cctv_reigon)]).mark_point().encode(x="CCTV", y="Crime",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("CCTV"), alt.Tooltip("Crime")]).properties(title="자치구별 CCTV & 범죄 수 산점도")
+        st.altair_chart(chart, use_container_width=True)
+    
+    with row4.container(height=400, border=True):
+        st.header("FUCK YOU")
+        st.write(f"Correlation : {corr[0]}")
+        st.write(f"p-value : {corr[1]}")
 
     with row5:
         my_map()

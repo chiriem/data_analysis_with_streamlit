@@ -13,7 +13,7 @@ from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static
 import time
-from vega_datasets import data
+import scipy.stats as stats
 
 @st.cache_data
 def get_enter():
@@ -22,7 +22,7 @@ def get_enter():
 
 @st.cache_data
 def get_enter_crime():
-    enter_crime = pd.read_csv("./data/유흥업소_범죄.csv")
+    enter_crime = pd.read_csv("./data/업소_찐막.csv")
     return enter_crime
 
 @st.cache_data
@@ -37,6 +37,12 @@ def enter_map():
     folium.TileLayer('cartodbpositron').add_to(m)
     folium_static(m)
 
+@st.cache_data
+def pearson():
+    enter_crime = get_enter_crime()
+    corr = stats.pearsonr(enter_crime["업소 갯수"], enter_crime["범죄수"])
+    return corr
+
 def run_enter_app():
     row1 = st.columns(1)
     row2 = st.columns(1)
@@ -45,6 +51,7 @@ def run_enter_app():
 
     enter = get_enter()
     enter_crime = get_enter_crime()
+    corr = pearson()
 
     for col in row1:
         tile = col.container(height=170, border=True)
@@ -57,12 +64,14 @@ def run_enter_app():
     #     tile = col.container(height=100, border=True)
     #     tile.slider("연도 선택", 2011, 2025, (2011, 2025), key="enter_year")
 
-    source = data.barley()
-
     with row3.container(height=400, border=True):
-        chart = alt.Chart(enter_crime).mark_point().encode(x="업소 갯수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("업소 갯수"), alt.Tooltip("범죄수")]).properties(title="자치구별 유흥업소 & 범죄 수 산점도")
+        chart = alt.Chart(enter_crime[enter_crime["자치구"].isin(select_reigon)]).mark_point().encode(x="업소 갯수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("업소 갯수"), alt.Tooltip("범죄수")]).properties(title="자치구별 유흥업소 & 범죄 수 산점도")
         st.altair_chart(chart, use_container_width=True)
-    row4.container(height=400, border=True).title("Analysis Result")
+    with row4.container(height=400, border=True):
+        st.text("유흥업소 갯수별 범죄 발생 비율")
+        st.write(f"약 {round(enter_crime["범죄율"].mean())}%로, 유흥업소가 많은 지역일수록 실제로 범죄 발생 건수가 많다.")
+        st.write(f"Correlation : {corr[0]}")
+        st.write(f"p-value : {corr[1]}")
 
     with row5:
         enter_map()
