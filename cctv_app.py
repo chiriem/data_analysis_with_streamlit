@@ -70,61 +70,31 @@ def pearson():
     cctv = get_cctv_crime()
     corr = stats.pearsonr(cctv["CCTV"], cctv["Crime"])
     return corr
-<<<<<<< HEAD
 
-# def cctv_loc():
-#     df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
-
-#     gu_list = ["전체"]
-
-#     for i in df_gu["자치구"].unique():
-#         gu_list.append(i)
-
-#     area = st.selectbox("자치구", gu_list)
-
-#     if area != "전체":
-#         df_gu = df_gu[df_gu["자치구"] == area]
-#         focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
-
-#         locations = []
-#         names = []
-
-#         for i in range(len(df_gu)):
-#             data = df_gu.iloc[i]
-#             locations.append((float(data["위도"]), float(data["경도"])))
-#             # names.append(f"{data["CCTV 수량"]}")
-
-#         map_gu = folium.Map(location = focus_on, zoom_start = 13)
-=======
 def cctv_loc():
->>>>>>> origin/main
+    df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
+
+    gu_list = ["전체"]
+
+    for i in df_gu["자치구"].unique():
+        gu_list.append(i)
+
+    area = st.selectbox("자치구", gu_list)
+
+    if area != "전체":
+        df_gu = df_gu[df_gu["자치구"] == area]
+        focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
+
+        locations = []
+        names = []
+
+        for i in range(len(df_gu)):
+            data = df_gu.iloc[i]
+            locations.append((float(data["위도"]), float(data["경도"])))
+            # names.append(f"{data["CCTV 수량"]}")
+
+        map_gu = folium.Map(location = focus_on, zoom_start = 13)
         
-#         marker_cluster = MarkerCluster(
-#             locations= locations,
-#             # popups = names,
-#             name = area,
-#             overlay = True, # 다른 레이어와 겹치기 허용
-#             control = True, # 레이어 on/off 박스 표시
-#         )
-
-#         marker_cluster.add_to(map_gu)
-#         folium.LayerControl().add_to(map_gu) # 컨트롤 박스 적용
-
-
-#     else:
-#         df_gu = pd.read_excel("cctv_count.xlsx")
-#         focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
-#         map_gu = folium.Map(location = focus_on, zoom_start = 11, min_zoom = 11, max_zoom = 11, zoom_control= False)
-
-#         for i in range(len(df_gu)):
-#             data = df_gu.iloc[i]
-#             iframe = folium.IFrame(f"{data["자치구"]} <br> {data["CCTV 수량"]}개")
-#             popup = folium.Popup(iframe, min_width=100, max_width= 300)
-#             folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
-        
-<<<<<<< HEAD
-#     folium_static(map_gu)
-=======
         marker_cluster = MarkerCluster(
             locations= locations,
             # popups = names,
@@ -149,7 +119,6 @@ def cctv_loc():
             folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
         
     folium_static(map_gu)
->>>>>>> origin/main
 
 def run_cctv_app():
     row1 = st.columns(1)
