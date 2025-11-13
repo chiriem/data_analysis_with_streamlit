@@ -61,9 +61,9 @@ def run_popul_app():
     for col in row2:
         tile = col.container(height=100, border=True)
         value = tile.slider("연도 선택", 2017, 2024, (2017, 2024), key="popul_year")
-
+    print(value)
     with row3.container(height=650, border=True):
-        st.header(f"{value[0]} ~ {value[1]}년 인구밀집도")
+        st.header(f"{value[1]}년 인구밀집도")
 
         ko = folium.Map(
             location=[37.5651, 126.98955], 
@@ -118,7 +118,10 @@ def run_popul_app():
             geo_str,
             style_function=style_function
         ).add_to(ko)
-        reigon = popul_crime.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].mean(axis=1).to_frame(name="범죄/인구 비율")
+        if value[0] == value[1]:
+            reigon = popul_crime.loc[reigon_select, f"{value[0]}"].to_frame(name="범죄/인구 비율")
+        else:
+            reigon = popul_crime.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].mean(axis=1).to_frame(name="범죄/인구 비율")
 
 
         kmap = folium.Choropleth(
