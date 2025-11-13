@@ -53,6 +53,11 @@ def get_cpc():
     return cpc
 
 @st.cache_data
+def get_line_data():
+    data = pd.read_csv("./data/CCTV그만.csv")
+    return data
+
+@st.cache_data
 def my_map():
     cctv_wgs84 = get_cctv_wgs84()
     m = folium.Map(location=[cctv_wgs84["위도"].mean(), cctv_wgs84["경도"].mean()], zoom_start=12, width=800)
@@ -70,61 +75,37 @@ def pearson():
     cctv = get_cctv_crime()
     corr = stats.pearsonr(cctv["CCTV"], cctv["Crime"])
     return corr
-<<<<<<< HEAD
 
-# def cctv_loc():
-#     df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
+@st.cache_data
+def get_pearson():
+    data = pd.read_csv("./data/CCTV그만.csv")
+    cor = stats.pearsonr(data["CCTV"], data["Crime"])
+    return cor
 
-#     gu_list = ["전체"]
-
-#     for i in df_gu["자치구"].unique():
-#         gu_list.append(i)
-
-#     area = st.selectbox("자치구", gu_list)
-
-#     if area != "전체":
-#         df_gu = df_gu[df_gu["자치구"] == area]
-#         focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
-
-#         locations = []
-#         names = []
-
-#         for i in range(len(df_gu)):
-#             data = df_gu.iloc[i]
-#             locations.append((float(data["위도"]), float(data["경도"])))
-#             # names.append(f"{data["CCTV 수량"]}")
-
-#         map_gu = folium.Map(location = focus_on, zoom_start = 13)
-=======
 def cctv_loc():
->>>>>>> origin/main
+    df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
+
+    gu_list = ["전체"]
+
+    for i in df_gu["자치구"].unique():
+        gu_list.append(i)
+
+    area = st.selectbox("자치구", gu_list)
+
+    if area != "전체":
+        df_gu = df_gu[df_gu["자치구"] == area]
+        focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
+
+        locations = []
+        names = []
+
+        for i in range(len(df_gu)):
+            data = df_gu.iloc[i]
+            locations.append((float(data["위도"]), float(data["경도"])))
+            # names.append(f"{data["CCTV 수량"]}")
+
+        map_gu = folium.Map(location = focus_on, zoom_start = 13)
         
-#         marker_cluster = MarkerCluster(
-#             locations= locations,
-#             # popups = names,
-#             name = area,
-#             overlay = True, # 다른 레이어와 겹치기 허용
-#             control = True, # 레이어 on/off 박스 표시
-#         )
-
-#         marker_cluster.add_to(map_gu)
-#         folium.LayerControl().add_to(map_gu) # 컨트롤 박스 적용
-
-
-#     else:
-#         df_gu = pd.read_excel("cctv_count.xlsx")
-#         focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
-#         map_gu = folium.Map(location = focus_on, zoom_start = 11, min_zoom = 11, max_zoom = 11, zoom_control= False)
-
-#         for i in range(len(df_gu)):
-#             data = df_gu.iloc[i]
-#             iframe = folium.IFrame(f"{data["자치구"]} <br> {data["CCTV 수량"]}개")
-#             popup = folium.Popup(iframe, min_width=100, max_width= 300)
-#             folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
-        
-<<<<<<< HEAD
-#     folium_static(map_gu)
-=======
         marker_cluster = MarkerCluster(
             locations= locations,
             # popups = names,
@@ -149,7 +130,6 @@ def cctv_loc():
             folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
         
     folium_static(map_gu)
->>>>>>> origin/main
 
 def run_cctv_app():
     row1 = st.columns(1)
@@ -161,25 +141,36 @@ def run_cctv_app():
     row9, row10 = st.columns([4, 6])
 
     cctv = get_cctv()
-    corr = pearson()
     cctv_crime = get_cctv_crime()
     cpc = get_cpc()
 
     for col in row1:
         tile = col.container(height=170, border=True)
+        
         cctv_reigon = tile.multiselect(
             "자치구 선택",
             [i for i in cctv.columns],
             default=[i for i in cctv.columns], key="cctv_reigon")
     
+    for col in row2:
+        tile = col.container(height=100, border=True)
+        c_value = tile.slider("연도 선택", 2016, 2024, (2016, 2024), key="cctv_year")
+
     with row3.container(height=400, border=True):
-        chart = alt.Chart(cctv_crime[cctv_crime["자치구"].isin(cctv_reigon)]).mark_point().encode(x="CCTV", y="Crime",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("CCTV"), alt.Tooltip("Crime")]).properties(title="자치구별 CCTV & 범죄 수 산점도")
-        st.altair_chart(chart, use_container_width=True)
+        line_data = get_line_data()
+        line_data = line_data.set_index("Year")
+        st.line_chart(data = line_data.loc[f"{c_value[0]}" : f"{c_value[1]}", ["CCTV", "Crime"]], x_label="연도", y_label="CCTV 수 & 범죄 수", color=["#1656AD","#D30000"])
+        # st.line_chart(data = line_data, x="Year", y="Crime", x_label="년도", y_label="범죄/CCTV 수", color="#D30000")
+        # chart = alt.Chart(cctv_crime[cctv_crime["자치구"].isin(cctv_reigon)]).mark_point().encode(x="CCTV", y="Crime",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("CCTV"), alt.Tooltip("Crime")]).properties(title="자치구별 CCTV & 범죄 수 산점도")
+        # st.altair_chart(chart, use_container_width=True)
     
     with row4.container(height=400, border=True):
-        st.header("FUCK YOU")
-        st.write(f"Correlation : {corr[0]}")
-        st.write(f"p-value : {corr[1]}")
+        cor = get_pearson()
+        st.text("CCTV 감시와 범죄 발생의 상관관계")
+        st.write(f"Correlation : {cor[0]}")
+        st.write(f"p-value : {cor[1]}")
+        st.write("CCTV 수가 증가할수록 범죄 발생수도 감소하고 있다.")
+        st.write("강한 음의 상관관계를 갖고 있으므로 CCTV 설치는 범죄 감소에 유의미한 영향을 줄 수 있다고 볼 수 있다.")
 
     for col in row5:
         tile = col.container(height=170, border=True)

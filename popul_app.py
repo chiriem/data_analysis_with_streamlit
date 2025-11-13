@@ -12,7 +12,7 @@ import json
 from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static
-import time
+import scipy.stats as stats
 
 def style_function(feature):
     return {
@@ -41,6 +41,12 @@ def get_cnp():
     cnp = pd.read_excel("./data/crime_and_population.xlsx")
     cnp = cnp.set_index("자치구")
     return cnp
+
+@st.cache_data
+def get_pearson():
+    data = pd.read_csv("./data/인구그만.csv")
+    cor = stats.pearsonr(data["Popul"], data["Crime"])
+    return cor
 
 def run_popul_app():
     row1 = st.columns(1)
@@ -101,13 +107,8 @@ def run_popul_app():
 
         folium_static(ko)
 
-<<<<<<< HEAD
-    with row4.container(height=600, border=True):
-        st.header(f"{value[0]} ~ {value[1]}년 인구/범죄 비율")
-=======
     with row4.container(height=650, border=True):
         st.header(f"{value}년 인구밀집별 범죄발생률")
->>>>>>> origin/main
         popul_crime = get_popul_crime()
 
         ko = folium.Map(
@@ -148,7 +149,8 @@ def run_popul_app():
 
     # for col in row5:
     #     tile = col.container(height=100, border=True)
-    #     value = tile.slider("연도 선택", 2017, 2024, 2024, key="popul_year2")
+    #     data = get_pearson()
+    #     st.dataframe(data)
     
     new_cnp = cnp.loc[:,[f"{value}_인구", f"{value}_범죄"]]
     with row6.container(height=500, border=False):
@@ -156,7 +158,10 @@ def run_popul_app():
 
     with row7.container(height=500, border=True):
         cnp = cnp.reset_index()
+        cor = get_pearson()
         chart = alt.Chart(cnp).mark_point().encode(x = f"{value}_인구",y = f"{value}_범죄",tooltip=[alt.Tooltip("자치구"), alt.Tooltip(f"{value}_인구"), alt.Tooltip(f"{value}_범죄")]).properties(title="자치구별 인구 & 범죄 수 산점도")
         st.altair_chart(chart, use_container_width=True)
+        st.write(f"Correlation : {cor[0]}")
+        st.write(f"p-value : {cor[1]}")
 
     
