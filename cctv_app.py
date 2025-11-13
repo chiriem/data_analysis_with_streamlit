@@ -156,7 +156,10 @@ def run_cctv_app():
         cpc_region = tile.multiselect(
             "자치구 선택",
             [i for i in cpc.columns],
-            default=[i for i in top5], key="cpc_region")
+            default=[i for i in top5],
+            key="cpc_region",
+            max_selections= 8
+        )
 
     for col in row6:
         tile = col.container(height=100, border=True)
