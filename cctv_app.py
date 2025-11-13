@@ -46,6 +46,13 @@ def get_cctv_crime():
     return cctv
 
 @st.cache_data
+def get_cpc():
+    cpc = pd.read_excel("./data/crime_per_cctv.xlsx")
+    cpc = cpc.set_index("자치구")
+    cpc = cpc.T
+    return cpc
+
+@st.cache_data
 def my_map():
     cctv_wgs84 = get_cctv_wgs84()
     m = folium.Map(location=[cctv_wgs84["위도"].mean(), cctv_wgs84["경도"].mean()], zoom_start=12, width=800)
@@ -117,11 +124,15 @@ def run_cctv_app():
     row1 = st.columns(1)
     row2 = st.columns(1)
     row3, row4 = st.columns([7, 3])
-    row5, row6 = st.columns([4, 6])
+    row5 = st.columns(1)
+    row6 = st.columns(1)
+    row7, row8 = st.columns([6, 4])
+    row9, row10 = st.columns([4, 6])
 
     cctv = get_cctv()
     corr = pearson()
     cctv_crime = get_cctv_crime()
+    cpc = get_cpc()
 
     for col in row1:
         tile = col.container(height=170, border=True)
@@ -129,10 +140,6 @@ def run_cctv_app():
             "자치구 선택",
             [i for i in cctv.columns],
             default=[i for i in cctv.columns], key="cctv_reigon")
-
-    for col in row2:
-        tile = col.container(height=100, border=True)
-        cctv_value = tile.slider("연도 선택", 2016, 2024, (2016, 2024), key="cctv_year")
     
     with row3.container(height=400, border=True):
         chart = alt.Chart(cctv_crime[cctv_crime["자치구"].isin(cctv_reigon)]).mark_point().encode(x="CCTV", y="Crime",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("CCTV"), alt.Tooltip("Crime")]).properties(title="자치구별 CCTV & 범죄 수 산점도")
@@ -143,6 +150,23 @@ def run_cctv_app():
         st.write(f"Correlation : {corr[0]}")
         st.write(f"p-value : {corr[1]}")
 
-    with row5:
+    for col in row5:
+        tile = col.container(height=170, border=True)
+        top5 = ["송파구", "마포구", "중구", "종로구", "강서구"]
+        cpc_region = tile.multiselect(
+            "자치구 선택",
+            [i for i in cpc.columns],
+            default=[i for i in top5], key="cpc_region")
+
+    for col in row6:
+        tile = col.container(height=100, border=True)
+        cpc_value = tile.slider("연도 선택", 2016, 2024, (2016, 2024), key="cpc_year")
+
+    with row7.container(height=500, border=True):
+        st.line_chart(data = cpc.loc[f"{cpc_value[0]}" : f"{cpc_value[1]}",cpc_region])
+    row8.container(height=500, border=True).dataframe(cpc.T.loc[cpc_region,f"{cpc_value[0]}" : f"{cpc_value[1]}"], height=450)
+
+
+    with row9:
         my_map()
-    row6.container(height=500, border=True).dataframe(cctv.T, height=450)
+    row10.container(height=500, border=True).dataframe(cctv.T, height=450)
