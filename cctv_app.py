@@ -166,7 +166,7 @@ def run_cctv_app():
         cpc_value = tile.slider("연도 선택", 2016, 2024, (2016, 2024), key="cpc_year")
 
     with row7.container(height=500, border=True):
-        st.line_chart(data = cpc.loc[f"{cpc_value[0]}" : f"{cpc_value[1]}", cpc_region])
+        st.line_chart(data = cpc.loc[f"{cpc_value[0]}" : f"{cpc_value[1]}", cpc_region], x_label="년도", y_label="범죄/CCTV 수")
 
     cpc_df = cpc.T
     cpc_df.columns = ["2016년", "2017년", "2018년", "2019년", "2020년", "2021년", "2022년", "2023년", "2024년"]
@@ -174,6 +174,7 @@ def run_cctv_app():
 
     with row8.container(height=500, border=True):
         st.dataframe(cpc_df)
+        st.text("구 별 범죄/CCTV 수")
 
     with row9:
         my_map()
