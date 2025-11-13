@@ -13,6 +13,7 @@ from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static
 import time
+import scipy.stats as stats
 
 @st.cache_data
 def get_police():
@@ -40,6 +41,12 @@ def police_map():
         ).add_to(marker_cluster)
     folium.TileLayer('cartodbpositron').add_to(m)
     folium_static(m)
+
+@st.cache_data
+def pearson():
+    data = get_office()
+    cor = stats.pearsonr(data["인구수/파출소수"], data["범죄수"])
+    return cor
 
 def run_police_app():
     row1 = st.columns(1)
@@ -70,8 +77,12 @@ def run_police_app():
     with row4.container(height=400, border=True):
         st.text("파출소 당 관리인구수와 범죄 발생 비율")
         # st.write(f"약 {round((office["범죄수"]/office["인구수/파출소수"]).mean())}%")
-        st.write("파출소 당 관리하는 인구 수가 늘어날 수록 범죄 수도 늘어남")
+        cor = pearson()
+        st.write(f"Correlation : {cor[0]}")
+        st.write(f"p-value : {cor[1]}")
+        st.write("파출소 수가 많다고해서 범죄 발생 감소의 기대치를 보긴 힘들다고 볼 수 있다.")
 
     with row5:
         police_map()
-    row6.container(height=500, border=True).dataframe(police[["이름", "구", "도로명주소"]], height=450)
+    row6.container(height=500, border=True).dataframe(office)
+    # row6.container(height=500, border=True).dataframe(police[["이름", "구", "도로명주소"]], height=450)

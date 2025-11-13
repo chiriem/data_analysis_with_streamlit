@@ -12,8 +12,7 @@ import json
 from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static
-import time
-from vega_datasets import data
+import scipy.stats as stats
 
 @st.cache_data
 def get_safe():
@@ -37,8 +36,13 @@ def my_map():
             location=[row["latitude"], row["longitude"]],
         ).add_to(marker_cluster)
     folium.TileLayer('cartodbpositron').add_to(m)
-    # st_data = st_folium(m, width=500, height=500)
     folium_static(m)
+
+@st.cache_data
+def pearson():
+    data = get_safe_crime()
+    cor = stats.pearsonr(data["지킴이집 갯수"], data["범죄수"])
+    return cor
 
 def run_safe_app():
     row1 = st.columns(1)
@@ -64,8 +68,15 @@ def run_safe_app():
         chart = alt.Chart(safe_crime[safe_crime["자치구"].isin(select_reigon)]).mark_point().encode(x="지킴이집 갯수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("지킴이집 갯수"), alt.Tooltip("범죄수")]).properties(title="자치구별 지킴이집 & 범죄 수 산점도")
         st.altair_chart(chart, use_container_width=True)
     with row4.container(height=400, border=True):
-        st.write("여성안심지킴이집이 많이 구비된 강남구는 범죄발생건수가 가장 높다. 여성안심지킴이집은 범죄율 감소에 영향을 주지 않는다고 보여진다.")
+        cor = pearson()
+        st.text("여성안심지킴이집과 범죄 발생의 상관관계")
+        st.write(f"Correlation : {cor[0]}")
+        st.write(f"p-value : {cor[1]}")
+        st.write("여성안심지킴이집이 많이 구비된 강남구는 오히려 범죄발생건수가 가장 높다.")
+        st.write("여성안심지킴이집이 많아도 범죄 감소에 영향을 주지 않는다고 판단할 수 있다.")
+        st.write("해당 시설이 제 역할을 못하고 있다고 보여진다.")
 
     with row5:
         my_map()
-    row6.container(height=500, border=True).dataframe(safe[["자치구", "브랜드", "소재지"]], height=450)
+    row6.container(height=500, border=True).dataframe(safe_crime)
+    # row6.container(height=500, border=True).dataframe(safe[["자치구", "브랜드", "소재지"]], height=450)
