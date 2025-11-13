@@ -151,6 +151,8 @@ def run_popul_app():
         st.dataframe(new_cnp)
 
     with row7.container(height=500, border=True):
-        st.scatter_chart(data = cnp, x = f"{value}_인구",y = f"{value}_범죄")
+        cnp = cnp.reset_index()
+        chart = alt.Chart(cnp).mark_point().encode(x = f"{value}_인구",y = f"{value}_범죄",tooltip=[alt.Tooltip("자치구"), alt.Tooltip(f"{value}_인구"), alt.Tooltip(f"{value}_범죄")]).properties(title="자치구별 인구 & 범죄 수 산점도")
+        st.altair_chart(chart, use_container_width=True)
 
     
