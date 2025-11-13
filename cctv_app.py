@@ -46,6 +46,13 @@ def get_cctv_crime():
     return cctv
 
 @st.cache_data
+def get_cpc():
+    cpc = pd.read_excel("./data/crime_per_cctv.xlsx")
+    cpc = cpc.set_index("자치구")
+    cpc = cpc.T
+    return cpc
+
+@st.cache_data
 def my_map():
     cctv_wgs84 = get_cctv_wgs84()
     m = folium.Map(location=[cctv_wgs84["위도"].mean(), cctv_wgs84["경도"].mean()], zoom_start=12, width=800)
@@ -63,6 +70,7 @@ def pearson():
     cctv = get_cctv_crime()
     corr = stats.pearsonr(cctv["CCTV"], cctv["Crime"])
     return corr
+<<<<<<< HEAD
 
 # def cctv_loc():
 #     df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
@@ -87,6 +95,9 @@ def pearson():
 #             # names.append(f"{data["CCTV 수량"]}")
 
 #         map_gu = folium.Map(location = focus_on, zoom_start = 13)
+=======
+def cctv_loc():
+>>>>>>> origin/main
         
 #         marker_cluster = MarkerCluster(
 #             locations= locations,
@@ -111,17 +122,48 @@ def pearson():
 #             popup = folium.Popup(iframe, min_width=100, max_width= 300)
 #             folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
         
+<<<<<<< HEAD
 #     folium_static(map_gu)
+=======
+        marker_cluster = MarkerCluster(
+            locations= locations,
+            # popups = names,
+            name = area,
+            overlay = True, # 다른 레이어와 겹치기 허용
+            control = True, # 레이어 on/off 박스 표시
+        )
+
+        marker_cluster.add_to(map_gu)
+        folium.LayerControl().add_to(map_gu) # 컨트롤 박스 적용
+
+
+    else:
+        df_gu = pd.read_excel("cctv_count.xlsx")
+        focus_on = [df_gu["위도"].mean(), df_gu["경도"].mean()]
+        map_gu = folium.Map(location = focus_on, zoom_start = 11, min_zoom = 11, max_zoom = 11, zoom_control= False)
+
+        for i in range(len(df_gu)):
+            data = df_gu.iloc[i]
+            iframe = folium.IFrame(f"{data["자치구"]} <br> {data["CCTV 수량"]}개")
+            popup = folium.Popup(iframe, min_width=100, max_width= 300)
+            folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
+        
+    folium_static(map_gu)
+>>>>>>> origin/main
 
 def run_cctv_app():
     row1 = st.columns(1)
     row2 = st.columns(1)
     row3, row4 = st.columns([7, 3])
-    row5, row6 = st.columns([4, 6])
+    row5 = st.columns(1)
+    row6 = st.columns(1)
+    row7, row8 = st.columns([6, 4])
+    row9, row10 = st.columns([4, 6])
 
     cctv = get_cctv()
     corr = pearson()
     cctv_crime = get_cctv_crime()
+    cpc = get_cpc()
 
     for col in row1:
         tile = col.container(height=170, border=True)
@@ -129,10 +171,6 @@ def run_cctv_app():
             "자치구 선택",
             [i for i in cctv.columns],
             default=[i for i in cctv.columns], key="cctv_reigon")
-
-    for col in row2:
-        tile = col.container(height=100, border=True)
-        cctv_value = tile.slider("연도 선택", 2016, 2024, (2016, 2024), key="cctv_year")
     
     with row3.container(height=400, border=True):
         chart = alt.Chart(cctv_crime[cctv_crime["자치구"].isin(cctv_reigon)]).mark_point().encode(x="CCTV", y="Crime",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("CCTV"), alt.Tooltip("Crime")]).properties(title="자치구별 CCTV & 범죄 수 산점도")
@@ -143,6 +181,32 @@ def run_cctv_app():
         st.write(f"Correlation : {corr[0]}")
         st.write(f"p-value : {corr[1]}")
 
-    with row5:
+    for col in row5:
+        tile = col.container(height=170, border=True)
+        top5 = ["송파구", "마포구", "중구", "종로구", "강서구"]
+        cpc_region = tile.multiselect(
+            "자치구 선택",
+            [i for i in cpc.columns],
+            default=[i for i in top5],
+            key="cpc_region",
+            max_selections= 8
+        )
+
+    for col in row6:
+        tile = col.container(height=100, border=True)
+        cpc_value = tile.slider("연도 선택", 2016, 2024, (2016, 2024), key="cpc_year")
+
+    with row7.container(height=500, border=True):
+        st.line_chart(data = cpc.loc[f"{cpc_value[0]}" : f"{cpc_value[1]}", cpc_region], x_label="년도", y_label="범죄/CCTV 수")
+
+    cpc_df = cpc.T
+    cpc_df.columns = ["2016년", "2017년", "2018년", "2019년", "2020년", "2021년", "2022년", "2023년", "2024년"]
+    cpc_df = cpc_df.loc[cpc_region, f"{cpc_value[0]}년" : f"{cpc_value[1]}년"]
+
+    with row8.container(height=500, border=True):
+        st.dataframe(cpc_df)
+        st.text("구 별 범죄/CCTV 수")
+
+    with row9:
         my_map()
-    row6.container(height=500, border=True).dataframe(cctv.T, height=450)
+    row10.container(height=500, border=True).dataframe(cctv.T, height=450)

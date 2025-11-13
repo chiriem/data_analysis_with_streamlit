@@ -47,7 +47,7 @@ def run_reigon_app():
 
     for col in row2:
         tile = col.container(height=100, border=True)
-        value = tile.slider("연도 선택", 2011, 2025, (2011, 2025), key="crime_year")
+        value = tile.slider("연도 선택", 2014, 2025, (2014, 2025), key="crime_year")
 
     with row3.container(height=600, border=True):
 

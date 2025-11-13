@@ -20,6 +20,11 @@ def get_police():
     return police
 
 @st.cache_data
+def get_office():
+    office = pd.read_excel("./data/police_crime.xlsx")
+    return office
+
+@st.cache_data
 def get_police_crime():
     police_crime = pd.read_csv("./data/파출소_범죄.csv")
     return police_crime
@@ -43,6 +48,7 @@ def run_police_app():
     row5, row6 = st.columns([4, 6])
 
     police = get_police()
+    office = get_office()
     police_crime = get_police_crime()
 
     for col in row1:
@@ -57,12 +63,14 @@ def run_police_app():
     #     tile.slider("연도 선택", 2011, 2025, (2011, 2025), key="enter_year")
 
     with row3.container(height=400, border=True):
-        chart = alt.Chart(police_crime[police_crime["자치구"].isin(select_reigon)]).mark_point().encode(x="파출소 수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("파출소 수"), alt.Tooltip("범죄수")]).properties(title="자치구별 파출소 & 범죄 수 산점도")
+        # chart = alt.Chart(police_crime[police_crime["자치구"].isin(select_reigon)]).mark_point().encode(x="파출소 수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("파출소 수"), alt.Tooltip("범죄수")]).properties(title="자치구별 파출소 & 범죄 수 산점도")
+        # st.altair_chart(chart, use_container_width=True)
+        chart = alt.Chart(office[office["자치구"].isin(select_reigon)]).mark_point().encode(x="인구수/파출소수", y="범죄수", tooltip=[alt.Tooltip("자치구"), alt.Tooltip("인구수/파출소수"), alt.Tooltip("범죄수")]).properties(title="자치구별 파출소 당 관리 인구 수 & 범죄 수 산점도")
         st.altair_chart(chart, use_container_width=True)
     with row4.container(height=400, border=True):
-        st.text("파출소 수별 범죄 발생 비율")
-        st.write(f"약 {round((police_crime["범죄수"]/police_crime["파출소 수"]).mean())}%")
-        st.write("파출소가 많다고해서 범죄가 줄어든다고 보기 어려움")
+        st.text("파출소 당 관리인구수와 범죄 발생 비율")
+        # st.write(f"약 {round((office["범죄수"]/office["인구수/파출소수"]).mean())}%")
+        st.write("파출소 당 관리하는 인구 수가 늘어날 수록 범죄 수도 늘어남")
 
     with row5:
         police_map()
