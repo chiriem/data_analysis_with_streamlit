@@ -36,11 +36,18 @@ def get_popul_crime():
     popul_crime = popul_crime.set_index("자치구")
     return popul_crime
 
+@st.cache_data
+def get_cnp():
+    cnp = pd.read_excel("./data/crime_and_population.xlsx")
+    cnp = cnp.set_index("자치구")
+    return cnp
+
 def run_popul_app():
     row1 = st.columns(1)
     row2 = st.columns(1)
     row3, row4 = st.columns([5, 5])
-    row5, row6 = st.columns([4, 6])
+    row5 = st.columns(1)
+    row6, row7 = st.columns([5, 5])
     
     popul = get_popul()
 
@@ -111,7 +118,7 @@ def run_popul_app():
             geo_str,
             style_function=style_function
         ).add_to(ko)
-        reigon = popul_crime.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].sum(axis=1).to_frame(name="범죄/인구 비율")
+        reigon = popul_crime.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].mean(axis=1).to_frame(name="범죄/인구 비율")
 
 
         kmap = folium.Choropleth(
@@ -131,6 +138,19 @@ def run_popul_app():
             folium.features.GeoJsonTooltip(['name'],labels=False) # Tooltip
         )
 
-
         folium_static(ko)
-    # row4.container(height=600, border=True).dataframe(popul)
+
+    cnp = get_cnp()
+
+    for col in row5:
+        tile = col.container(height=100, border=True)
+        value = tile.slider("연도 선택", 2017, 2024, 2024, key="popul_year2")
+    
+    new_cnp = cnp.loc[:,[f"{value}_인구", f"{value}_범죄"]]
+    with row6.container(height=500, border=False):
+        st.dataframe(new_cnp)
+
+    with row7.container(height=500, border=True):
+        st.scatter_chart(data = cnp, x = f"{value}_인구",y = f"{value}_범죄")
+
+    
