@@ -60,10 +60,10 @@ def run_popul_app():
 
     for col in row2:
         tile = col.container(height=100, border=True)
-        value = tile.slider("연도 선택", 2017, 2024, (2017, 2024), key="popul_year")
-    print(value)
+        value = tile.slider("연도 선택", 2017, 2024, 2024, key="popul_year")
+        
     with row3.container(height=650, border=True):
-        st.header(f"{value[1]}년 인구밀집도")
+        st.header(f"{value}년 인구밀집도")
 
         ko = folium.Map(
             location=[37.5651, 126.98955], 
@@ -78,7 +78,7 @@ def run_popul_app():
             geo_str,
             style_function=style_function
         ).add_to(ko)
-        reigon = popul.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].sum(axis=1).to_frame(name="인구수")
+        reigon = popul.loc[reigon_select, f"{value}년"].to_frame(name="인구수")
 
 
         kmap = folium.Choropleth(
@@ -89,7 +89,7 @@ def run_popul_app():
             fill_opacity=0.7,
             line_opacity=0.2,
             key_on='properties.name',
-            legend_name=f"{value[0]}~{value[1]} 인구수"
+            legend_name=f"{value}년 인구수"
         ).add_to(ko)
 
         # 툴팁처리 추가
@@ -102,7 +102,7 @@ def run_popul_app():
         folium_static(ko)
 
     with row4.container(height=650, border=True):
-        st.header(f"{value[0]} ~ {value[1]}년 인구밀집별 범죄발생률")
+        st.header(f"{value}년 인구밀집별 범죄발생률")
         popul_crime = get_popul_crime()
 
         ko = folium.Map(
@@ -118,11 +118,7 @@ def run_popul_app():
             geo_str,
             style_function=style_function
         ).add_to(ko)
-        if value[0] == value[1]:
-            reigon = popul_crime.loc[reigon_select, f"{value[0]}"].to_frame(name="범죄/인구 비율")
-        else:
-            reigon = popul_crime.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].mean(axis=1).to_frame(name="범죄/인구 비율")
-
+        reigon = popul_crime.loc[reigon_select, f"{value}"].to_frame(name="범죄/인구 비율")
 
         kmap = folium.Choropleth(
             geo_data=geo_str,
@@ -132,7 +128,7 @@ def run_popul_app():
             fill_opacity=0.7,
             line_opacity=0.2,
             key_on='properties.name',
-            legend_name=f"{value[0]}~{value[1]} 범죄/인구 비율"
+            legend_name=f"{value} 범죄/인구 비율"
         ).add_to(ko)
 
         # 툴팁처리 추가
@@ -145,9 +141,9 @@ def run_popul_app():
 
     cnp = get_cnp()
 
-    for col in row5:
-        tile = col.container(height=100, border=True)
-        value = tile.slider("연도 선택", 2017, 2024, 2024, key="popul_year2")
+    # for col in row5:
+    #     tile = col.container(height=100, border=True)
+    #     value = tile.slider("연도 선택", 2017, 2024, 2024, key="popul_year2")
     
     new_cnp = cnp.loc[:,[f"{value}_인구", f"{value}_범죄"]]
     with row6.container(height=500, border=False):
