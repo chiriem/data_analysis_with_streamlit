@@ -101,8 +101,13 @@ def run_popul_app():
 
         folium_static(ko)
 
+<<<<<<< HEAD
+    with row4.container(height=600, border=True):
+        st.header(f"{value[0]} ~ {value[1]}년 인구/범죄 비율")
+=======
     with row4.container(height=650, border=True):
         st.header(f"{value}년 인구밀집별 범죄발생률")
+>>>>>>> origin/main
         popul_crime = get_popul_crime()
 
         ko = folium.Map(
