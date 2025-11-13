@@ -59,12 +59,10 @@ def my_map():
     folium_static(m)
 
 @st.cache_data
-<<<<<<< HEAD
 def pearson():
     cctv = get_cctv_crime()
     corr = stats.pearsonr(cctv["CCTV"], cctv["Crime"])
     return corr
-=======
 def cctv_loc():
         
     df_gu = pd.read_excel("seoul_cctv_loc.xlsx")
@@ -114,7 +112,6 @@ def cctv_loc():
             folium.Marker([data["위도"], data["경도"]], popup=popup).add_to(map_gu)
         
     folium_static(map_gu)
->>>>>>> 7982b09d9f2102232759a8462076f7f134a89e6f
 
 def run_cctv_app():
     row1 = st.columns(1)
