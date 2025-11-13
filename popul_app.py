@@ -31,7 +31,8 @@ def get_popul():
 
 @st.cache_data
 def get_popul_crime():
-    popul_crime = pd.read_csv("./data/인구밀집별_범죄비율.csv")
+    # popul_crime = pd.read_csv("./data/인구밀집별_범죄비율.csv")
+    popul_crime = pd.read_excel("./data/crime_per_person.xlsx")
     popul_crime = popul_crime.set_index("자치구")
     return popul_crime
 
@@ -54,7 +55,7 @@ def run_popul_app():
         tile = col.container(height=100, border=True)
         value = tile.slider("연도 선택", 2017, 2024, (2017, 2024), key="popul_year")
 
-    with row3.container(height=600, border=True):
+    with row3.container(height=650, border=True):
         st.header(f"{value[0]} ~ {value[1]}년 인구밀집도")
 
         ko = folium.Map(
@@ -93,7 +94,7 @@ def run_popul_app():
 
         folium_static(ko)
 
-    with row4.container(height=600, border=True):
+    with row4.container(height=650, border=True):
         st.header(f"{value[0]} ~ {value[1]}년 인구밀집별 범죄발생률")
         popul_crime = get_popul_crime()
 
@@ -110,18 +111,18 @@ def run_popul_app():
             geo_str,
             style_function=style_function
         ).add_to(ko)
-        reigon = popul_crime.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].sum(axis=1).to_frame(name="인구/범죄 비율")
+        reigon = popul_crime.loc[reigon_select, f"{value[0]}년":f"{value[1]}년"].sum(axis=1).to_frame(name="범죄/인구 비율")
 
 
         kmap = folium.Choropleth(
             geo_data=geo_str,
             data=reigon,
-            columns=[reigon.index, "인구/범죄 비율"],
-            fill_color='YlGnBu',
+            columns=[reigon.index, "범죄/인구 비율"],
+            fill_color='Reds',
             fill_opacity=0.7,
             line_opacity=0.2,
             key_on='properties.name',
-            legend_name=f"{value[0]}~{value[1]} 인구/범죄 비율"
+            legend_name=f"{value[0]}~{value[1]} 범죄/인구 비율"
         ).add_to(ko)
 
         # 툴팁처리 추가

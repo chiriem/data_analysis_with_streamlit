@@ -169,7 +169,8 @@ def run_cctv_app():
     cpc_df.columns = ["2016년", "2017년", "2018년", "2019년", "2020년", "2021년", "2022년", "2023년", "2024년"]
     cpc_df = cpc_df.loc[cpc_region, f"{cpc_value[0]}년" : f"{cpc_value[1]}년"]
 
-    row8.container(height=500, border=True).dataframe(cpc_df, height=450)
+    with row8.container(height=500, border=True):
+        st.dataframe(cpc_df)
 
     with row9:
         my_map()

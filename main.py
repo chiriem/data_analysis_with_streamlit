@@ -10,8 +10,6 @@ from reigon_app import run_reigon_app
 from time_app import run_time_app
 from police_app import run_police_app
 from popul_app import run_popul_app
-from populaion_app import run_population_app
-from office_app import run_office_app
 
 st.markdown("""
     <style>
