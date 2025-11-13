@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import altair as alt
 import plotly.express as px
 import os
@@ -13,13 +12,9 @@ from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static
 import time
-from vega_datasets import data
-from cctv_app import run_cctv_app
 
 @st.cache_data
 def get_data():
-    sido = json.load(open("./data/SIDO_MAP_2022.json", encoding="utf-8"))
-    bell = gpd.read_file("./data/bell.geojson")
     bell_df = pd.read_csv("./data/비상벨.csv", index_col=0)
     return bell_df
 
@@ -34,7 +29,7 @@ def my_map():
             location=[row["lat"], row["lon"]],
         ).add_to(marker_cluster)
     folium.TileLayer('cartodbpositron').add_to(m)
-    # st_data = st_folium(m, width=500, height=500)
+    
     folium_static(m)
 
 def run_bell_app():
@@ -56,10 +51,13 @@ def run_bell_app():
         tile = col.container(height=100, border=True)
         tile.slider("연도 선택", 2003, 2025, (2003, 2025), key="bell_year")
 
-    source = data.barley()
+    with row3.container(height=400, border=True):
+        st.write("FUCK YOU")
+        # chart = alt.Chart().mark_line().encode().properties()
+        # st.altair_chart(chart, use_container_width=True)
 
-    row3.container(height=400, border=True).bar_chart(source, x="variety", y="yield", color="site", horizontal=True)
-    row4.container(height=400, border=True).title("Analysis Result")
+    with row4.container(height=400, border=True):
+        st.write("FUCK YOU")
 
     with row5:
         my_map()

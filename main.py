@@ -8,13 +8,8 @@ from safe_app import run_safe_app
 from enter_app import run_enter_app
 from reigon_app import run_reigon_app
 from time_app import run_time_app
-<<<<<<< HEAD
 from police_app import run_police_app
 from popul_app import run_popul_app
-=======
-from populaion_app import run_population_app
-from office_app import run_office_app
->>>>>>> 7982b09d9f2102232759a8462076f7f134a89e6f
 
 st.markdown("""
     <style>
