@@ -40,7 +40,7 @@ def enter_map():
 @st.cache_data
 def pearson():
     enter_crime = get_enter_crime()
-    corr = stats.pearsonr(enter_crime["업소 갯수"], enter_crime["범죄수"])
+    corr = stats.pearsonr(enter_crime["업소 개수"], enter_crime["범죄수"])
     return corr
 
 def run_enter_app():
@@ -65,10 +65,10 @@ def run_enter_app():
     #     tile.slider("연도 선택", 2011, 2025, (2011, 2025), key="enter_year")
 
     with row3.container(height=400, border=True):
-        chart = alt.Chart(enter_crime[enter_crime["자치구"].isin(select_reigon)]).mark_point().encode(x="업소 갯수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("업소 갯수"), alt.Tooltip("범죄수")]).properties(title="자치구별 유흥업소 & 범죄 수 산점도")
+        chart = alt.Chart(enter_crime[enter_crime["자치구"].isin(select_reigon)]).mark_point().encode(x="업소 개수", y="범죄수",tooltip=[alt.Tooltip("자치구"), alt.Tooltip("업소 개수"), alt.Tooltip("범죄수")]).properties(title="자치구별 유흥업소 & 범죄 수 산점도")
         st.altair_chart(chart, use_container_width=True)
     with row4.container(height=400, border=True):
-        st.text("유흥업소 갯수별 범죄 발생 비율")
+        st.text("유흥업소 개수별 범죄 발생 비율")
         st.write(f"약 {round(enter_crime["범죄율"].mean())}%로, 유흥업소가 많은 지역일수록 실제로 범죄 발생 건수가 많다.")
         st.write(f"Correlation : {corr[0]}")
         st.write(f"p-value : {corr[1]}")
