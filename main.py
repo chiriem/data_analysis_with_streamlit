@@ -32,15 +32,12 @@ def main():
     page_config()
     st.title("서울특별시 범죄발생률 감소요인 분석")
 
-    tab_region, tab_time, tab_bell, tab_cctv, tab_enter, tab_popul, tab_safe, tab_police = st.tabs(["지역별 범죄 발생률", "시간대별 범죄 발생률", "비상안전벨", "CCTV", "유흥업소", "인구밀집도", "여성안심지킴이집", "파출소"])
+    tab_region, tab_popul, tab_time, tab_enter, tab_safe, tab_bell, tab_police, tab_cctv = st.tabs(["자치구별 범죄 발생률", "인구밀집도", "시간대별 범죄 발생률", "유흥업소", "여성안심지킴이집", "비상안전벨", "파출소", "CCTV"])
     with tab_region:
         run_reigon_app()
 
-    with tab_bell:
-        run_bell_app()
-
-    with tab_cctv:
-        run_cctv_app()
+    with tab_popul:
+        run_popul_app()
 
     with tab_time:
         run_time_app()
@@ -48,14 +45,17 @@ def main():
     with tab_enter:
         run_enter_app()
 
-    with tab_popul:
-        run_popul_app()
-
     with tab_safe:
         run_safe_app()
 
+    with tab_bell:
+        run_bell_app()
+
     with tab_police:
         run_police_app()
+
+    with tab_cctv:
+        run_cctv_app()
 
 @st.cache_data
 def fontRegistered():
