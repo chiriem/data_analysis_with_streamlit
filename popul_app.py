@@ -32,7 +32,7 @@ def get_popul():
 @st.cache_data
 def get_popul_crime():
     # popul_crime = pd.read_csv("./data/인구밀집별_범죄비율.csv")
-    popul_crime = pd.read_excel("./data/crime_per_person.xlsx")
+    popul_crime = pd.read_csv("./data/구별범죄통계.csv")
     popul_crime = popul_crime.set_index("자치구")
     return popul_crime
 
@@ -108,7 +108,7 @@ def run_popul_app():
         folium_static(ko)
 
     with row4.container(height=650, border=True):
-        st.header(f"{value}년 인구밀집별 범죄발생률")
+        st.header(f"{value}년 범죄 수")
         popul_crime = get_popul_crime()
 
         ko = folium.Map(
@@ -124,17 +124,17 @@ def run_popul_app():
             geo_str,
             style_function=style_function
         ).add_to(ko)
-        reigon = popul_crime.loc[reigon_select, f"{value}"].to_frame(name="범죄/인구 비율")
+        reigon = popul_crime.loc[reigon_select, f"{value}"].to_frame(name="범죄 수")
 
         kmap = folium.Choropleth(
             geo_data=geo_str,
             data=reigon,
-            columns=[reigon.index, "범죄/인구 비율"],
+            columns=[reigon.index, "범죄 수"],
             fill_color='Reds',
             fill_opacity=0.7,
             line_opacity=0.2,
             key_on='properties.name',
-            legend_name=f"{value} 범죄/인구 비율"
+            legend_name=f"{value} 범죄 수"
         ).add_to(ko)
 
         # 툴팁처리 추가
